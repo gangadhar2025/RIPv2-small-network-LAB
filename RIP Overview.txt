@@ -1,0 +1,218 @@
+RIP (Routing Information Protocol) :
+
+RIP - RIP is a distance vector routing protocol used by routers to exchange routing information within a network. It determines the best path to a destination based on the hop count (number of routers a packet must pass through). RIP has a maximum hop limit of 15, making it suitable for small to medium-sized networks.
+
+Autonomous System (AS) - An Autonomous System (AS) is a collection of IP networks and routers under the control of a single organization or administrative authority that shares a common routing policy.
+
+
+IGP vs EGP : 
+
+IGP (Interior Gateway Protocol) is used for intra-domain routing – routing within a single Autonomous System (AS)
+Examples: RIP, OSPF, EIGRP, IS-IS
+
+EGP (Exterior Gateway Protocol) is used for inter-domain routing – routing between different Autonomous Systems.
+Example: BGP (Border Gateway Protocol)
+
+Distance Vector Routing Protocols (like RIP) use the Bellman-Ford algorithm to determine the best path to each network by calculating the shortest distance (metric)—usually based on hop count.
+
+
+Key Features of RIP (Routing Information Protocol) :
+
+1.Full Routing Table Sharing
+  Routers share their entire routing table with neighbors.
+
+2.Hop Count Metric
+  RIP uses hop count as its metric.
+  Maximum hop count = 15 (16 = unreachable).
+
+3.Periodic Updates
+  Routing updates are sent every 30 seconds (both RIPv1 and RIPv2).
+
+4.Transport Protocol
+  RIP uses UDP Port 520 to send messages.
+
+5.Administrative Distance (AD)
+  RIP has a default AD of 120 in Cisco routers.
+
+ RIP Versions two :
+
+1.RIPv1 (Classful)
+
+No support for VLSM/CIDR
+
+No authentication
+
+Uses broadcast address: 255.255.255.255
+
+2. RIPv2 (Classless)
+
+Supports VLSM/CIDR
+
+Supports authentication
+
+Sends updates via multicast: 224.0.0.9
+
+RIP Message Types:
+
+RIP uses two types of messages to exchange routing information between routers:
+
+Request Message
+. Sent to ask a RIP-enabled neighboring router to share its routing table.
+. Used during startup or when routing information is needed.
+
+Response Message
+. Contains the sender's full routing table.
+. Sent in response to a request or during periodic updates (every 30 seconds).
+
+. Both message types are sent using UDP Port 520.
+
+
+
+1. Activating RIP on Interfaces
+RIP is activated on network interfaces that match the specified network.
+. The router checks all its interfaces and enables RIP on those that belong to the configured network.
+
+2.Sending and Receiving RIP Updates
+Sending RIP Updates
+. Once RIP is enabled on an interface, the router advertises the network prefixes of the enabled interfaces. By default, RIP follows classful boundaries (i.e., classful network addresses).
+. RIPv2 can be configured to disable classful behavior by using no auto-summary.
+
+Example:
+
+192.168.1.1/25 still gets advertised as 192.168.1.0/24
+
+10.0.1.1/30 still gets advertised as 10.0.0.0/8
+
+Receiving RIP Updates
+
+. The router listens for RIP updates:
+
+RIPv2 uses multicast address 224.0.0.9
+
+RIPv1 uses broadcast address 255.255.255.255
+
+. When the router receives updates from a neighboring router, it processes the information and adds valid routes to its routing table.  Every 30 seconds, RIP routers send their full routing table to neighbors, helping them stay updated.
+
+. Handling RIP Updates
+
+If a router receives an update from another RIP-enabled router, it checks the new routes. If valid, the router adds the new routes to its routing table.
+
+Passive Interface in RIP :
+
+A Passive Interface in RIP is an interface that:
+
+1. Receives RIP Updates
+
+The interface learns routes from neighboring RIP routers.
+
+2. Does Not Send RIP Updates
+
+It does not advertise routes to neighbors on that interface, preventing unnecessary updates.
+
+3. Prevents Unnecessary Traffic
+
+It helps reduce unnecessary RIP broadcast traffic on segments where no RIP neighbors exist.
+
+Example: LAN segments with end-hosts (no routers involved).
+
+3. Typical Use Cases:
+
+LAN segments where RIP is not needed because there are no RIP neighbors.
+
+Point-to-point links where RIP updates are necessary for routing.
+
+
+RIP Load Balancing :
+
+
+Metric: Hop Count
+
+1. RIP uses hop count as its metric
+A lower hop count means a better path.
+
+2. Load Balancing Across Equal-Cost Paths
+
+If multiple paths to a destination have the same hop count, RIP will treat them as equal-cost paths.
+
+RIP will then load balance the traffic, sending it across these equal-cost paths.
+
+3. Routing Table Load Balancing
+
+Check the routing table to see if more than one path is available. If so, RIP will split the traffic between them.
+
+4. Maximum Paths for Load Balancing
+
+By default, RIP supports up to 4 equal-cost paths.
+
+If you need more than 4, you can configure RIP to allow up to 6 paths (or more, depending on the router’s settings).
+
+
+Command to Configure Maximum Paths :
+
+router rip
+maximum-paths 6 ( To allow up to 6 equal-cost paths )
+
+
+default-information originate Command in RIP :
+
+The default-information originate command is used in RIP to advertise a default route (0.0.0.0/0) to other RIP routers in the network. This is useful when you want to direct all traffic destined for unknown networks (typically heading towards the internet) to a default next-hop router.
+
+
+commands use ;
+
+router ip 
+version 2
+network 192.168.1.0
+netwrok 192.16.2.0
+no auto summary 
+passive interface e5/0 ( for LANC side interface ) 
+
+Main Router :
+
+
+ip route 0.0.0.0 0.0.0.0 next hop ip 
+default inforamtion originate 
+
+
+.show ip protocols
+
+.show ip route rip
+
+.debug ip rip - for real time updates 
+
+.sh ip int br 
+
+.sh run 
+
+.sh ip int br | ex una
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
